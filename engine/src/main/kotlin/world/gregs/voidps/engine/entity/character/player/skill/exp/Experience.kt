@@ -86,4 +86,19 @@ class Experience(
     }
 }
 
-fun Player.exp(skill: Skill, experience: Double) = this.experience.add(skill, experience)
+fun Player.exp(skill: Skill, experience: Double) = this.experience.add(skill, experience * progressiveRate(skill))
+
+private fun Player.progressiveRate(skill: Skill): Double {
+    val min = Settings["world.experienceRate.progressive.min", 1.0]
+    val max = Settings["world.experienceRate.progressive.max", 1.0]
+    if (min == max) {
+        return min
+    }
+    // Constitution levels are stored x10 and start at level 10
+    val constitution = skill == Skill.Constitution
+    val level = if (constitution) levels.getMax(skill) / 10 else levels.getMax(skill)
+    val start = if (constitution) 10 else 1
+    val progress = ((level - start).toDouble() / (99 - start)).coerceIn(0.0, 1.0)
+    return min + (max - min) * progress
+}
+
