@@ -101,4 +101,3 @@ private fun Player.progressiveRate(skill: Skill): Double {
     val progress = ((level - start).toDouble() / (99 - start)).coerceIn(0.0, 1.0)
     return min + (max - min) * progress
 }
-
